@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 // Palette is a collection of colors
@@ -17,12 +18,14 @@ type Color struct {
 	R, G, B uint8
 }
 
+// NewPalette creates a new Palette
 func NewPalette() *Palette {
 	return &Palette{
 		Colors: make(map[uint8]Color),
 	}
 }
 
+// Load loads a GIMP palette file into the Palette
 func (p *Palette) Load(gplFile string) error {
 	file, err := os.Open(gplFile)
 	if err != nil {
@@ -33,21 +36,68 @@ func (p *Palette) Load(gplFile string) error {
 	buf := bufio.NewScanner(file)
 
 	// Format: R G B comment
-	re := regexp.MustCompile(`\d \d \d \w+`)
+	re := regexp.MustCompile(`^(\d+)\s+(\d+)\s+(\d+)\s+(.*)$`)
 
+	var i uint8
+	var j int
 	for buf.Scan() {
+		j++
 		line := buf.Text()
 		if line == "" || line[0] == '#' {
 			continue
 		}
 
-		parts := re.Split(line, -1)
-		if len(parts) != 3 {
+		color, err := extractRGB(re, line)
+		if err != nil {
+			return fmt.Errorf("incolid color at line %d: %w", j, err)
+		}
+		if color == nil {
 			continue
 		}
 
-		fmt.Println(parts)
+		p.Colors[i] = *color
+		i++
 	}
 
 	return nil
+}
+
+// extractRGB extracts a RGB color from a line of text
+func extractRGB(re *regexp.Regexp, line string) (*Color, error) {
+	matches := re.FindStringSubmatch(line)
+	if matches == nil {
+		return nil, nil
+	}
+
+	r, g, b, err := convertRGBMatchesToInt(matches[1:])
+	if err != nil {
+		return nil, err
+	}
+
+	return &Color{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+	}, nil
+}
+
+// convertRGBMatchesToInt converts a slice of RGB matches to int values
+func convertRGBMatchesToInt(matches []string) (int, int, int, error) {
+	if len(matches) != 4 {
+		return 0, 0, 0, fmt.Errorf("incolid number of matches: %d", len(matches))
+	}
+
+	var col [3]int
+	var err error
+	for i := range col {
+		col[i], err = strconv.Atoi(matches[i])
+		if err != nil {
+			return 0, 0, 0, fmt.Errorf("invalid value at index %d: %v", i, err)
+		}
+		if col[i] < 0 || col[i] > 255 {
+			return 0, 0, 0, fmt.Errorf("invalid value at index %d: %d", i, col[i])
+		}
+	}
+
+	return col[0], col[1], col[2], nil
 }
