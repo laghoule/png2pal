@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/laghoule/png2pal/internal/pkg/pal"
+
 	"image/color"
 	"image/png"
 	"os"
@@ -17,11 +19,11 @@ var (
 func main() {
 	src := flag.String("src", "", "source file")
 	dst := flag.String("dst", "x", "destination file")
-	pal := flag.String("palette", "x", "GIMP palette file")
+	gpl := flag.String("palette", "mia.gpl", "GIMP palette file")
 	idx := flag.Int("index", 0, "index of the palette to use for transparency")
 	flag.Parse()
 
-	if *src == "" || *dst == "" || *pal == "" {
+	if *src == "" || *dst == "" || *gpl == "" {
 		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>")
 		exitWithError(err)
 	}
@@ -46,6 +48,17 @@ func main() {
 	if imgSrc.ColorModel() != color.NRGBAModel {
 		err := fmt.Errorf("png2pal: source image must be in RGBA format")
 		exitWithError(err)
+	}
+
+	p := pal.NewPalette()
+	if err := p.Load(*gpl); err != nil {
+		exitWithError(err)
+	}
+
+	for i := 0; i < len(p.Colors); i++ {
+		if i == *idx {
+			fmt.Printf("Transparent index %d: %v\n", i, p.Colors[uint8(i)])
+		}
 	}
 
 }
