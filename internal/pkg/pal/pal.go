@@ -89,15 +89,44 @@ func convertRGBMatchesToInt(matches []string) (int, int, int, error) {
 
 	var col [3]int
 	var err error
+
 	for i := range col {
 		col[i], err = strconv.Atoi(matches[i])
 		if err != nil {
 			return 0, 0, 0, fmt.Errorf("invalid value at index %d: %v", i, err)
 		}
+
 		if col[i] < 0 || col[i] > 255 {
 			return 0, 0, 0, fmt.Errorf("invalid value at index %d: %d", i, col[i])
 		}
 	}
 
 	return col[0], col[1], col[2], nil
+}
+
+// FindClosestColorIndex finds the index of the closest color in the palette to the target color
+// Euclidian distance: D = √ [ (R1 - R2)² + (G1 - G2)² + (B1 - B2)² ]
+func (p *Palette) FindClosestColorIndex(target Color) uint8 {
+	var closestIndex uint8
+	minDistSq := -1 // initialize to invalid value (for first comparison)
+
+	for idx, palColor := range p.Colors {
+		dr := int(palColor.R) - int(target.R)
+		dg := int(palColor.G) - int(target.G)
+		db := int(palColor.B) - int(target.B)
+
+		drSq := dr * dr
+		dgSq := dg * dg
+		dbSq := db * db
+
+		// No need to calculate the square root, since we are comparing distances
+		currentDist := int(drSq + dgSq + dbSq)
+
+		if minDistSq == -1 || currentDist < minDistSq {
+			minDistSq = currentDist
+			closestIndex = uint8(idx)
+		}
+	}
+
+	return closestIndex
 }

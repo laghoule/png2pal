@@ -61,6 +61,11 @@ func main() {
 		}
 	}
 
+	testColor := pal.Color{R: 25,G: 50,B: 100}
+	fmt.Printf("Test color: %v\n", testColor)
+	closestIndex := p.FindClosestColorIndex(testColor)
+	fmt.Printf("Closest color: %v at index %d\n", p.Colors[closestIndex], closestIndex)
+
 }
 
 // exitWithError prints the error and exits with status code 1
