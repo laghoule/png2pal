@@ -3,9 +3,20 @@ package pal
 import (
 	"bufio"
 	"fmt"
+	"image/color"
 	"os"
 	"regexp"
 	"strconv"
+)
+
+const (
+	opaqueAlpha      = 255
+	VGAColors        = 256
+	lastIndexedColor = VGAColors - 1
+)
+
+var (
+	defaultColor = color.RGBA{R: 0, G: 0, B: 0, A: opaqueAlpha}
 )
 
 // Palette is a collection of colors
@@ -49,7 +60,7 @@ func (p *Palette) Load(gplFile string) error {
 
 		color, err := extractRGB(re, line)
 		if err != nil {
-			return fmt.Errorf("incolid color at line %d: %w", j, err)
+			return fmt.Errorf("invalid color at line %d: %w", j, err)
 		}
 		if color == nil {
 			continue
@@ -57,6 +68,10 @@ func (p *Palette) Load(gplFile string) error {
 
 		p.Colors[i] = *color
 		i++
+	}
+
+	if len(p.Colors) < VGAColors {
+		return fmt.Errorf("invalid number of colors: %d, should be %d", len(p.Colors), VGAColors)
 	}
 
 	return nil
@@ -129,4 +144,26 @@ func (p *Palette) FindClosestColorIndex(target Color) uint8 {
 	}
 
 	return closestIndex
+}
+
+// ToColorPaletted converts the Palette to a color.Palette
+func (p *Palette) ToColorPaletted() color.Palette {
+	colPal := make(color.Palette, VGAColors)
+
+	// 0 is the transparent color, we skip
+	// defaultColor is used if the palette has less than 256 colors
+	for i := 1; i <= lastIndexedColor; i++ {
+		if len(p.Colors) >= i {
+			colPal[i] = color.RGBA{
+				R: p.Colors[uint8(i)].R,
+				G: p.Colors[uint8(i)].G,
+				B: p.Colors[uint8(i)].B,
+				A: opaqueAlpha,
+			}
+		} else {
+			colPal[i] = defaultColor
+		}
+	}
+
+	return colPal
 }
