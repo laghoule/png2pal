@@ -21,7 +21,7 @@ type Color struct {
 // NewPalette creates a new Palette
 func NewPalette() *Palette {
 	return &Palette{
-		Colors: make(map[uint8]Color),
+		Colors: make(map[uint8]Color, 255),
 	}
 }
 
