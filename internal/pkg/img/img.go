@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// img is a struct that holds the source and destination image paths
 type img struct {
 	src string
 	dst string
@@ -28,6 +29,7 @@ func NewImage(src, dst, pal string) (*img, error) {
 	}, nil
 }
 
+// Convert converts the source image to a paletted image
 func (i *img) Convert() error {
 	dstFile, err := os.Create(i.dst)
 	if err != nil {
