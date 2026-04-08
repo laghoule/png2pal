@@ -1,6 +1,7 @@
 package img
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -10,16 +11,21 @@ import (
 type img struct {
 	src string
 	dst string
-	pal Palette
+	pal *Palette
 }
 
 // NewImage creates a new img instance
-func NewImage(src, dst string, pal *Palette) *img {
+func NewImage(src, dst, pal string) (*img, error) {
+	p := NewPalette()
+	if err := p.Load(pal); err != nil {
+		return nil, fmt.Errorf("png2pal: failed to load palette: %v", err)
+	}
+	
 	return &img{
 		src: src,
 		dst: dst,
-		pal: *pal,
-	}
+		pal: p,
+	}, nil
 }
 
 func (i *img) Convert() error {
@@ -38,6 +44,11 @@ func (i *img) Convert() error {
 	srcImage, err := png.Decode(srcFile)
 	if err != nil {
 		return err
+	}
+
+	// NRGBAModel is the color model for RGBA images.
+	if srcImage.ColorModel() != color.NRGBAModel {
+		return fmt.Errorf("png2pal: source image must be in RGBA format")
 	}
 
 	newRect := srcImage.Bounds()

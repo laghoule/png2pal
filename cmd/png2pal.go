@@ -3,12 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/laghoule/png2pal/internal/pkg/img"
-
-	"image/color"
-	"image/png"
-	"os"
 )
 
 var (
@@ -27,30 +24,19 @@ func main() {
 		exitWithError(err)
 	}
 
-	fileSrc, err := os.Open(*src)
-	if err != nil {
-		exitWithError(err)
-	}
-	defer fileSrc.Close()
-
-	imgSrc, err := png.Decode(fileSrc)
-	if err != nil {
-		exitWithError(err)
-	}
-
-	// NRGBAModel is the color model for RGBA images.
-	if imgSrc.ColorModel() != color.NRGBAModel {
-		err := fmt.Errorf("png2pal: source image must be in RGBA format")
-		exitWithError(err)
-	}
-
 	p := img.NewPalette()
 	if err := p.Load(*gpl); err != nil {
 		exitWithError(err)
 	}
 
-	imgDst := img.NewImage(*src, *dst, p)
-	imgDst.Convert()
+	img, err := img.NewImage(*src, *dst, *gpl)
+	if err != nil {
+		exitWithError(err)
+	}
+	
+	if err := img.Convert(); err != nil {
+		exitWithError(err)
+	}
 
 }
 
