@@ -26,12 +26,6 @@ func main() {
 		exitWithError(err)
 	}
 
-	fmt.Printf("Loading palette %s\n", *gpl)
-	p := img.NewPalette()
-	if err := p.Load(*gpl); err != nil {
-		exitWithError(err)
-	}
-
 	fmt.Printf("Converting %s to %s\n", *src, *dst)
 	img, err := img.NewImage(*src, *dst, *gpl)
 	if err != nil {
