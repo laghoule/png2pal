@@ -51,24 +51,29 @@ func (i *img) Convert() error {
 		for x := range newRect.Max.X {
 			r, g, b, a := srcImage.At(x, y).RGBA()
 
+			// if alpha is 0, set to transparent
 			if a == 0 {
 				destImage.SetColorIndex(x, y, 0)
-			} else {
-				c = color.RGBA{
-					R: uint8(r >> 8),
-					G: uint8(g >> 8),
-					B: uint8(b >> 8),
-				}
-
-				nearestColorIndex := i.pal.FindClosestColorIndex(Color{
-					R: c.R,
-					G: c.G,
-					B: c.B,
-				})
-
-				destImage.SetColorIndex(x, y, nearestColorIndex)
+				continue
 			}
+
+			// convert to 8 bit color
+			c = color.RGBA{
+				R: uint8(r >> 8),
+				G: uint8(g >> 8),
+				B: uint8(b >> 8),
+			}
+
+			// find the nearest color in the palette
+			nearestColorIndex := i.pal.FindClosestColorIndex(Color{
+				R: c.R,
+				G: c.G,
+				B: c.B,
+			})
+
+			destImage.SetColorIndex(x, y, nearestColorIndex)
 		}
+
 	}
 
 	err = png.Encode(dstFile, destImage)
