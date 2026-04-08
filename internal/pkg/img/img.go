@@ -54,7 +54,7 @@ func (i *img) Convert() error {
 	}
 
 	newRect := srcImage.Bounds()
-	destImage := image.NewPaletted(newRect, i.pal.ToColorPaletted())
+	destImage := image.NewPaletted(newRect, i.pal.toColorPaletted())
 	c := gocolor.RGBA{}
 
 	for y := range newRect.Max.Y {
@@ -75,7 +75,7 @@ func (i *img) Convert() error {
 			}
 
 			// find the nearest color in the palette
-			nearestColorIndex := i.pal.FindClosestColorIndex(color{
+			nearestColorIndex := i.pal.findClosestColorIndex(color{
 				r: c.R,
 				g: c.G,
 				b: c.B,

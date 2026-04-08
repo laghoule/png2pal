@@ -19,7 +19,7 @@ func main() {
 	gpl := flag.String("palette", "", "GIMP palette file")
 	flag.Parse()
 
-	fmt.Printf("png2pal version: %s, git commit: (%s)\n", version, gitCommit)
+	fmt.Printf("png2pal version: %s, git commit: (%s)\n\n", version, gitCommit)
 
 	if *src == "" || *dst == "" || *gpl == "" {
 		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>")

@@ -116,9 +116,9 @@ func convertRGBMatchesToInt(matches []string) (int, int, int, error) {
 	return col[0], col[1], col[2], nil
 }
 
-// FindClosestColorIndex finds the index of the closest color in the palette to the target color
+// findClosestColorIndex finds the index of the closest color in the palette to the target color
 // Euclidian distance: D = √ [ (R1 - R2)² + (G1 - G2)² + (B1 - B2)² ]
-func (p *palette) FindClosestColorIndex(target color) uint8 {
+func (p *palette) findClosestColorIndex(target color) uint8 {
 	var closestIndex uint8
 	minDistSq := -1 // initialize to invalid value (for first comparison)
 
@@ -147,8 +147,8 @@ func (p *palette) FindClosestColorIndex(target color) uint8 {
 	return closestIndex
 }
 
-// ToColorPaletted converts the Palette to a color.Palette
-func (p *palette) ToColorPaletted() gocolor.Palette {
+// toColorPaletted converts the Palette to a color.Palette
+func (p *palette) toColorPaletted() gocolor.Palette {
 	colPal := make(gocolor.Palette, VGAColors)
 
 	// Set the first color to transparent
