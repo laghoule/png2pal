@@ -16,10 +16,6 @@ const (
 	lastIndexedColor = VGAColors - 1
 )
 
-var (
-	defaultColor = color.RGBA{R: 0, G: 0, B: 0, A: transparantAlpha}
-)
-
 // Palette is a collection of colors
 type Palette struct {
 	Colors map[uint8]Color
@@ -155,10 +151,14 @@ func (p *Palette) FindClosestColorIndex(target Color) uint8 {
 func (p *Palette) ToColorPaletted() color.Palette {
 	colPal := make(color.Palette, VGAColors)
 
-	// 0 is the transparent color, we skip
-	// defaultColor is used if the palette has less than 256 colors
-	colPal[0] = defaultColor
-	
+	// Set the first color to transparent
+	colPal[0] = color.RGBA{
+		R: p.Colors[uint8(0)].R,
+		G: p.Colors[uint8(0)].G,
+		B: p.Colors[uint8(0)].B,
+		A: transparantAlpha,
+	}
+
 	for i := 1; i <= lastIndexedColor; i++ {
 		if len(p.Colors) >= i {
 			colPal[i] = color.RGBA{
@@ -167,9 +167,11 @@ func (p *Palette) ToColorPaletted() color.Palette {
 				B: p.Colors[uint8(i)].B,
 				A: opaqueAlpha,
 			}
-		} else {
-			colPal[i] = defaultColor
+			continue
 		}
+
+		// If the palette is smaller than the expected size, fill the rest with the first color
+		colPal[i] = colPal[0]
 	}
 
 	return colPal
