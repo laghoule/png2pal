@@ -44,7 +44,7 @@ Requires [Go](https://go.dev/) 1.26.1 or later.
 ```sh
 git clone https://github.com/laghoule/png2pal.git
 cd png2pal
-go build -o png2pal ./cmd/png2pal.go
+go build -o png2pal ./cmd/main.go
 ```
 
 ### Docker
