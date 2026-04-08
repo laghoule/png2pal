@@ -1,4 +1,4 @@
-package pal
+package img
 
 import (
 	"bufio"
@@ -10,13 +10,14 @@ import (
 )
 
 const (
+	transparantAlpha = 0
 	opaqueAlpha      = 255
 	VGAColors        = 256
 	lastIndexedColor = VGAColors - 1
 )
 
 var (
-	defaultColor = color.RGBA{R: 0, G: 0, B: 0, A: opaqueAlpha}
+	defaultColor = color.RGBA{R: 0, G: 0, B: 0, A: transparantAlpha}
 )
 
 // Palette is a collection of colors
@@ -126,6 +127,10 @@ func (p *Palette) FindClosestColorIndex(target Color) uint8 {
 	minDistSq := -1 // initialize to invalid value (for first comparison)
 
 	for idx, palColor := range p.Colors {
+		if idx == 0 {
+			continue // skip the transparent color
+		}
+
 		dr := int(palColor.R) - int(target.R)
 		dg := int(palColor.G) - int(target.G)
 		db := int(palColor.B) - int(target.B)
@@ -152,6 +157,8 @@ func (p *Palette) ToColorPaletted() color.Palette {
 
 	// 0 is the transparent color, we skip
 	// defaultColor is used if the palette has less than 256 colors
+	colPal[0] = defaultColor
+	
 	for i := 1; i <= lastIndexedColor; i++ {
 		if len(p.Colors) >= i {
 			colPal[i] = color.RGBA{

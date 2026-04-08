@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/laghoule/png2pal/internal/pkg/pal"
+	"github.com/laghoule/png2pal/internal/pkg/img"
 
 	"image/color"
 	"image/png"
@@ -50,7 +50,7 @@ func main() {
 		exitWithError(err)
 	}
 
-	p := pal.NewPalette()
+	p := img.NewPalette()
 	if err := p.Load(*gpl); err != nil {
 		exitWithError(err)
 	}
@@ -61,11 +61,17 @@ func main() {
 		}
 	}
 
-	testColor := pal.Color{R: 25,G: 50,B: 100}
+	testColor := img.Color{R: 25, G: 50, B: 100}
 	fmt.Printf("Test color: %v\n", testColor)
 	closestIndex := p.FindClosestColorIndex(testColor)
 	fmt.Printf("Closest color: %v at index %d\n", p.Colors[closestIndex], closestIndex)
 
+	colPal := p.ToColorPaletted()
+	fmt.Printf("Closest colerPaletted: %v\n", colPal[int(closestIndex)])
+	
+	imgDst := img.NewImage(*src, *dst, p)
+	imgDst.Convert()
+	
 }
 
 // exitWithError prints the error and exits with status code 1
