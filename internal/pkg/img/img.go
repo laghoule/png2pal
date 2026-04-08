@@ -3,7 +3,7 @@ package img
 import (
 	"fmt"
 	"image"
-	"image/color"
+	gocolor "image/color"
 	"image/png"
 	"os"
 )
@@ -11,7 +11,7 @@ import (
 type img struct {
 	src string
 	dst string
-	pal *Palette
+	pal *palette
 }
 
 // NewImage creates a new img instance
@@ -20,7 +20,7 @@ func NewImage(src, dst, pal string) (*img, error) {
 	if err := p.Load(pal); err != nil {
 		return nil, fmt.Errorf("png2pal: failed to load palette: %v", err)
 	}
-	
+
 	return &img{
 		src: src,
 		dst: dst,
@@ -47,13 +47,13 @@ func (i *img) Convert() error {
 	}
 
 	// NRGBAModel is the color model for RGBA images.
-	if srcImage.ColorModel() != color.NRGBAModel {
+	if srcImage.ColorModel() != gocolor.NRGBAModel {
 		return fmt.Errorf("png2pal: source image must be in RGBA format")
 	}
 
 	newRect := srcImage.Bounds()
 	destImage := image.NewPaletted(newRect, i.pal.ToColorPaletted())
-	c := color.RGBA{}
+	c := gocolor.RGBA{}
 
 	for y := range newRect.Max.Y {
 		for x := range newRect.Max.X {
@@ -66,17 +66,17 @@ func (i *img) Convert() error {
 			}
 
 			// convert to 8 bit color
-			c = color.RGBA{
+			c = gocolor.RGBA{
 				R: uint8(r >> 8),
 				G: uint8(g >> 8),
 				B: uint8(b >> 8),
 			}
 
 			// find the nearest color in the palette
-			nearestColorIndex := i.pal.FindClosestColorIndex(Color{
-				R: c.R,
-				G: c.G,
-				B: c.B,
+			nearestColorIndex := i.pal.FindClosestColorIndex(color{
+				r: c.R,
+				g: c.G,
+				b: c.B,
 			})
 
 			destImage.SetColorIndex(x, y, nearestColorIndex)

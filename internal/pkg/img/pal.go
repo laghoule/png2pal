@@ -3,7 +3,7 @@ package img
 import (
 	"bufio"
 	"fmt"
-	"image/color"
+	gocolor "image/color"
 	"os"
 	"regexp"
 	"strconv"
@@ -17,24 +17,24 @@ const (
 )
 
 // Palette is a collection of colors
-type Palette struct {
-	Colors map[uint8]Color
+type palette struct {
+	colors map[uint8]color
 }
 
 // Color is a RGB color
-type Color struct {
-	R, G, B uint8
+type color struct {
+	r, g, b uint8
 }
 
 // NewPalette creates a new Palette
-func NewPalette() *Palette {
-	return &Palette{
-		Colors: make(map[uint8]Color, 255),
+func NewPalette() *palette {
+	return &palette{
+		colors: make(map[uint8]color, 255),
 	}
 }
 
 // Load loads a GIMP palette file into the Palette
-func (p *Palette) Load(gplFile string) error {
+func (p *palette) Load(gplFile string) error {
 	file, err := os.Open(gplFile)
 	if err != nil {
 		return err
@@ -63,19 +63,19 @@ func (p *Palette) Load(gplFile string) error {
 			continue
 		}
 
-		p.Colors[i] = *color
+		p.colors[i] = *color
 		i++
 	}
 
-	if len(p.Colors) < VGAColors {
-		return fmt.Errorf("invalid number of colors: %d, should be %d", len(p.Colors), VGAColors)
+	if len(p.colors) < VGAColors {
+		return fmt.Errorf("invalid number of colors: %d, should be %d", len(p.colors), VGAColors)
 	}
 
 	return nil
 }
 
 // extractRGB extracts a RGB color from a line of text
-func extractRGB(re *regexp.Regexp, line string) (*Color, error) {
+func extractRGB(re *regexp.Regexp, line string) (*color, error) {
 	matches := re.FindStringSubmatch(line)
 	if matches == nil {
 		return nil, nil
@@ -86,10 +86,10 @@ func extractRGB(re *regexp.Regexp, line string) (*Color, error) {
 		return nil, err
 	}
 
-	return &Color{
-		R: uint8(r),
-		G: uint8(g),
-		B: uint8(b),
+	return &color{
+		r: uint8(r),
+		g: uint8(g),
+		b: uint8(b),
 	}, nil
 }
 
@@ -118,18 +118,18 @@ func convertRGBMatchesToInt(matches []string) (int, int, int, error) {
 
 // FindClosestColorIndex finds the index of the closest color in the palette to the target color
 // Euclidian distance: D = √ [ (R1 - R2)² + (G1 - G2)² + (B1 - B2)² ]
-func (p *Palette) FindClosestColorIndex(target Color) uint8 {
+func (p *palette) FindClosestColorIndex(target color) uint8 {
 	var closestIndex uint8
 	minDistSq := -1 // initialize to invalid value (for first comparison)
 
-	for idx, palColor := range p.Colors {
+	for idx, palColor := range p.colors {
 		if idx == 0 {
 			continue // skip the transparent color
 		}
 
-		dr := int(palColor.R) - int(target.R)
-		dg := int(palColor.G) - int(target.G)
-		db := int(palColor.B) - int(target.B)
+		dr := int(palColor.r) - int(target.r)
+		dg := int(palColor.g) - int(target.g)
+		db := int(palColor.b) - int(target.b)
 
 		drSq := dr * dr
 		dgSq := dg * dg
@@ -148,23 +148,23 @@ func (p *Palette) FindClosestColorIndex(target Color) uint8 {
 }
 
 // ToColorPaletted converts the Palette to a color.Palette
-func (p *Palette) ToColorPaletted() color.Palette {
-	colPal := make(color.Palette, VGAColors)
+func (p *palette) ToColorPaletted() gocolor.Palette {
+	colPal := make(gocolor.Palette, VGAColors)
 
 	// Set the first color to transparent
-	colPal[0] = color.RGBA{
-		R: p.Colors[uint8(0)].R,
-		G: p.Colors[uint8(0)].G,
-		B: p.Colors[uint8(0)].B,
+	colPal[0] = gocolor.RGBA{
+		R: p.colors[uint8(0)].r,
+		G: p.colors[uint8(0)].g,
+		B: p.colors[uint8(0)].b,
 		A: transparantAlpha,
 	}
 
 	for i := 1; i <= lastIndexedColor; i++ {
-		if len(p.Colors) >= i {
-			colPal[i] = color.RGBA{
-				R: p.Colors[uint8(i)].R,
-				G: p.Colors[uint8(i)].G,
-				B: p.Colors[uint8(i)].B,
+		if len(p.colors) >= i {
+			colPal[i] = gocolor.RGBA{
+				R: p.colors[uint8(i)].r,
+				G: p.colors[uint8(i)].g,
+				B: p.colors[uint8(i)].b,
 				A: opaqueAlpha,
 			}
 			continue
