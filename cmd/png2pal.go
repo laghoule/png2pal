@@ -15,8 +15,8 @@ var (
 
 func main() {
 	src := flag.String("src", "", "source file")
-	dst := flag.String("dst", "x", "destination file")
-	gpl := flag.String("palette", "mia.gpl", "GIMP palette file")
+	dst := flag.String("dst", "", "destination file")
+	gpl := flag.String("palette", "", "GIMP palette file")
 	flag.Parse()
 
 	if *src == "" || *dst == "" || *gpl == "" {
@@ -33,11 +33,10 @@ func main() {
 	if err != nil {
 		exitWithError(err)
 	}
-	
+
 	if err := img.Convert(); err != nil {
 		exitWithError(err)
 	}
-
 }
 
 // exitWithError prints the error and exits with status code 1
