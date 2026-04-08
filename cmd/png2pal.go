@@ -20,16 +20,10 @@ func main() {
 	src := flag.String("src", "", "source file")
 	dst := flag.String("dst", "x", "destination file")
 	gpl := flag.String("palette", "mia.gpl", "GIMP palette file")
-	idx := flag.Int("index", 0, "index of the palette to use for transparency")
 	flag.Parse()
 
 	if *src == "" || *dst == "" || *gpl == "" {
 		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>")
-		exitWithError(err)
-	}
-
-	if *idx < 0 || *idx > 255 {
-		err := fmt.Errorf("png2pal: index must be between 0 and 255")
 		exitWithError(err)
 	}
 
@@ -55,23 +49,9 @@ func main() {
 		exitWithError(err)
 	}
 
-	for i := 0; i < len(p.Colors); i++ {
-		if i == *idx {
-			fmt.Printf("Transparent index %d: %v\n", i, p.Colors[uint8(i)])
-		}
-	}
-
-	testColor := img.Color{R: 25, G: 50, B: 100}
-	fmt.Printf("Test color: %v\n", testColor)
-	closestIndex := p.FindClosestColorIndex(testColor)
-	fmt.Printf("Closest color: %v at index %d\n", p.Colors[closestIndex], closestIndex)
-
-	colPal := p.ToColorPaletted()
-	fmt.Printf("Closest colerPaletted: %v\n", colPal[int(closestIndex)])
-	
 	imgDst := img.NewImage(*src, *dst, p)
 	imgDst.Convert()
-	
+
 }
 
 // exitWithError prints the error and exits with status code 1

@@ -1,7 +1,6 @@
 package img
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -44,8 +43,6 @@ func (i *img) Convert() error {
 	newRect := srcImage.Bounds()
 	destImage := image.NewPaletted(newRect, i.pal.ToColorPaletted())
 	c := color.RGBA{}
-
-	fmt.Println(i.pal.ToColorPaletted())
 
 	for y := range newRect.Max.Y {
 		for x := range newRect.Max.X {
