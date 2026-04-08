@@ -19,16 +19,20 @@ func main() {
 	gpl := flag.String("palette", "", "GIMP palette file")
 	flag.Parse()
 
+	fmt.Printf("png2pal version: %s, git commit: (%s)\n", version, gitCommit)
+
 	if *src == "" || *dst == "" || *gpl == "" {
 		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>")
 		exitWithError(err)
 	}
 
+	fmt.Printf("Loading palette %s\n", *gpl)
 	p := img.NewPalette()
 	if err := p.Load(*gpl); err != nil {
 		exitWithError(err)
 	}
 
+	fmt.Printf("Converting %s to %s\n", *src, *dst)
 	img, err := img.NewImage(*src, *dst, *gpl)
 	if err != nil {
 		exitWithError(err)
