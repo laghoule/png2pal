@@ -44,7 +44,7 @@ func (p *palette) Load(gplFile string) error {
 	buf := bufio.NewScanner(file)
 
 	// Format: R G B comment
-	re := regexp.MustCompile(`^(\d+)\s+(\d+)\s+(\d+)\s+(.*)$`)
+	re := regexp.MustCompile(`(\d+)\s+(\d+)\s+(\d+)\s+(.*)$`)
 
 	var i uint8
 	var j int
