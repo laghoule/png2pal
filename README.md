@@ -14,15 +14,14 @@
 
 ## How It Works
 
-1. **Load the palette** – Parse the `.gpl` file and store all 256 RGB entries.
-2. **Decode the source image** – Read the input PNG and verify it is in RGBA format.
-3. **Remap every pixel** – For each pixel:
+1. **Decode the source image** – Read the input PNG, load the `.gpl` palette, and verify the image is in RGBA format.
+2. **Remap every pixel** – For each pixel:
    - If the alpha channel is 0, the pixel is mapped to palette index 0 (transparent).
    - Otherwise, the closest palette color is found using the squared Euclidean distance formula:
      ```
      D² = (R1-R2)² + (G1-G2)² + (B1-B2)²
      ```
-4. **Encode the output** – Write the resulting indexed image as a new PNG file.
+3. **Encode the output** – Write the resulting indexed image as a new PNG file.
 
 ## Prerequisites
 
@@ -71,25 +70,25 @@ docker run --rm \
   ghcr.io/laghoule/png2pal:latest \
   -src /data/input.png \
   -dst /data/output.png \
-  -palette /data/my-palette.gpl
+  -pal /data/my-palette.gpl
 ```
 
 ## Usage
 
 ```
-png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>
+png2pal -src <source file> -dst <destination file> -pal <GIMP palette file>
 ```
 
 | Flag       | Description                                                       |
 | ---------- | ----------------------------------------------------------------- |
 | `-src`     | Path to the **source** PNG image (must be RGBA).                  |
 | `-dst`     | Path to write the **output** paletted PNG image.                  |
-| `-palette` | Path to a **GIMP palette** (`.gpl`) file with exactly 256 colors. |
+| `-pal`     | Path to a **GIMP palette** (`.gpl`) file with exactly 256 colors. |
 
 **Example:**
 
 ```sh
-png2pal -src tileset.png -dst tileset_indexed.png -palette my-palette.gpl
+png2pal -src tileset.png -dst tileset_indexed.png -pal my-palette.gpl
 ```
 
 ---
