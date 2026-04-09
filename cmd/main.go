@@ -16,18 +16,18 @@ var (
 func main() {
 	src := flag.String("src", "", "source file")
 	dst := flag.String("dst", "", "destination file")
-	gpl := flag.String("palette", "", "GIMP palette file")
+	pal := flag.String("pal", "", "GIMP palette file")
 	flag.Parse()
 
 	fmt.Printf("png2pal version: %s, git commit: (%s)\n\n", version, gitCommit)
 
-	if *src == "" || *dst == "" || *gpl == "" {
-		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -palette <GIMP palette file>")
+	if *src == "" || *dst == "" || *pal == "" {
+		err := fmt.Errorf("png2pal -src <source file> -dst <destination file> -pal <GIMP palette file>")
 		exitWithError(err)
 	}
 
 	fmt.Printf("Converting %s to %s\n", *src, *dst)
-	img, err := img.NewImage(*src, *dst, *gpl)
+	img, err := img.NewImage(*src, *dst, *pal)
 	if err != nil {
 		exitWithError(err)
 	}
