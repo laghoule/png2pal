@@ -26,6 +26,7 @@ jobs:
           ldflags: -X 'main.version=${{env.VERSION}}' -X 'main.gitCommit=${{ github.sha }}'
           project_path: "cmd/"
           release_tag: "${{ env.VERSION }}"
+          release_name: "${{ env.VERSION }}"
           extra_files: LICENSE README.md
           retry: 10
 
