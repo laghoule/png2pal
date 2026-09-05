@@ -38,7 +38,7 @@ Download the archive for your platform, extract it, and place the binary somewhe
 
 ### Build from Source
 
-Requires [Go](https://go.dev/) 1.26.1 or later.
+Requires [Go](https://go.dev/) 1.27.1 or later.
 
 ```sh
 git clone https://github.com/laghoule/png2pal.git
