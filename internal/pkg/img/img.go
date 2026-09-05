@@ -31,12 +31,6 @@ func NewImage(src, dst, pal string) (*img, error) {
 
 // Convert converts the source image to a paletted image
 func (i *img) Convert() error {
-	dstFile, err := os.Create(i.dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
 	srcFile, err := os.Open(i.src)
 	if err != nil {
 		return err
@@ -52,6 +46,12 @@ func (i *img) Convert() error {
 	if srcImage.ColorModel() != gocolor.NRGBAModel {
 		return fmt.Errorf("png2pal: source image must be in RGBA format")
 	}
+
+	dstFile, err := os.Create(i.dst)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
 
 	newRect := srcImage.Bounds()
 	destImage := image.NewPaletted(newRect, i.pal.toColorPaletted())
